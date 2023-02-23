@@ -8,6 +8,13 @@
  * 
  * Modified version of usermod_v2_word_clock. This usermod can be used to drive
  * a word clock with 12x10 pixel matrix with WLED.
+ * 
+ * @TODO:
+ *  - Duitse letters omzetten naar NL
+ *  - Minuten deel verwijderen en omtoveren naar "bijna"
+ *  - Code opschonen
+ *  - Kijken of we de button Long Press kunnen uitlezen en op basis daarvan de WordClock aan of uitzetten
+ *  - Iets doen met DEFAULT_BRIGHTNESS en op basis van dag en nacht de felheid aanpassen. Daar ook een optie van maken
  */
 
 //class name. Use something descriptive and leave the ": public Usermod" part :)
@@ -18,8 +25,8 @@ class UsermodDKWordClock : public Usermod {
 
     // set your config variables to their boot default value (this can also be done in readFromConfig() or a constructor if you prefer)
     bool usermodActive = false;
-    bool displayItIs = false;
-    int ledOffset = 100;
+    bool displayItIs = true;
+    int ledOffset = 0;
     bool meander = false;
     bool nord = false;
     
@@ -418,7 +425,7 @@ class UsermodDKWordClock : public Usermod {
      */
     void addToConfig(JsonObject& root)
     {
-      JsonObject top = root.createNestedObject("WordClockUsermod");
+      JsonObject top = root.createNestedObject("UsermodDKWordClock");
       top["active"] = usermodActive;
       top["displayItIs"] = displayItIs;
       top["ledOffset"] = ledOffset;
@@ -446,7 +453,7 @@ class UsermodDKWordClock : public Usermod {
       // default settings values could be set here (or below using the 3-argument getJsonValue()) instead of in the class definition or constructor
       // setting them inside readFromConfig() is slightly more robust, handling the rare but plausible use case of single value being missing after boot (e.g. if the cfg.json was manually edited and a value was removed)
 
-      JsonObject top = root["WordClockUsermod"];
+      JsonObject top = root["UsermodDKWordClock"];
 
       bool configComplete = !top.isNull();
 
