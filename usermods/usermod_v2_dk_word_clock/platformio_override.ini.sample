@@ -1,0 +1,15 @@
+[platformio]
+default_envs = d1_mini
+
+[env:d1_mini]
+board = d1_mini
+platform = ${common.platform_wled_default}
+platform_packages = ${common.platform_packages}
+upload_speed = 115200
+board_build.ldscript = ${common.ldscript_4m1m}
+build_unflags = ${common.build_unflags}
+build_flags = ${common.build_flags_esp8266}
+   -D WLED_AP_SSID_UNIQUE
+   -D USERMOD_DK_WORDCLOCK
+   -D DEFAULT_LED_COUNT=120
+   -D DEFAULT_LED_TYPE=TYPE_SK6812_RGBW
