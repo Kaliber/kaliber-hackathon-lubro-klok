@@ -17,7 +17,7 @@ class UsermodDKWordClock : public Usermod {
 
     // set your config variables to their boot default value (this can also be done in readFromConfig() or a constructor if you prefer)
     bool usermodActive = false;
-    bool displayItIs = true;
+    bool heartEnabled = false;
     
     // defines for mask sizes
     #define maskSizeLeds        120
@@ -65,6 +65,9 @@ class UsermodDKWordClock : public Usermod {
 
     // mask "bijna"
     const int maskAlmost[maskSizeAlmost] = {7, 8, 9, 10, 11};
+
+    // heart matrix location
+    const int heartPin = 119;
 
     // overall mask to define which LEDs are on
     int maskLedsOn[maskSizeLeds] = 
@@ -120,6 +123,11 @@ class UsermodDKWordClock : public Usermod {
       
       // display "het is"
       updateLedMask(maskItIs, maskSizeItIs);
+
+      // show heart if enabled
+      if (heartEnabled) {
+        maskLedsOn[heartPin] = 1;
+      }
 
       switch (minutes) {
         case 0:
@@ -301,9 +309,6 @@ class UsermodDKWordClock : public Usermod {
 
       // do it every 5 seconds
       if (millis() - lastTime > 5000) {
-        // check the time
-        int minutes = minute(localTime);
-
         // update the display with new time
         updateDisplay(hourFormat12(localTime), minute(localTime));
 
@@ -373,6 +378,7 @@ class UsermodDKWordClock : public Usermod {
     void addToConfig(JsonObject& root) {
       JsonObject top = root.createNestedObject("UsermodDKWordClock");
       top["active"] = usermodActive;
+      top["heartSymbol"] = heartEnabled;
     }
 
     /*
@@ -399,6 +405,7 @@ class UsermodDKWordClock : public Usermod {
       bool configComplete = !top.isNull();
 
       configComplete &= getJsonValue(top["active"], usermodActive);
+      configComplete &= getJsonValue(top["heartSymbol"], heartEnabled);
 
       return configComplete;
     }
@@ -418,6 +425,10 @@ class UsermodDKWordClock : public Usermod {
             // set pixel off
             strip.setPixelColor(x, RGBW32(0,0,0,0));
           }
+        }
+
+        if (heartEnabled) {
+          strip.setPixelColor(heartPin, RGBW32(255,0,0,0)); // Making sure the heart is always "red"
         }
       }
     }
