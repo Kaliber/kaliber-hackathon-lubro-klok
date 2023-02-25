@@ -11,7 +11,7 @@
  * 
  * @TODO:
  *  [x] Duitse letters omzetten naar NL
- *  [ ] Minuten deel verwijderen en omtoveren naar "bijna"
+ *  [x] Minuten deel verwijderen en omtoveren naar "bijna"
  *  [ ] Code opschonen
  *  [ ] Kijken of we de button Long Press kunnen uitlezen en op basis daarvan de WordClock aan of uitzetten => zie `button.cpp`
  *  [ ] Iets doen met DEFAULT_BRIGHTNESS en op basis van dag en nacht de felheid aanpassen. Daar ook een optie van maken
@@ -32,6 +32,7 @@ class UsermodDKWordClock : public Usermod {
     #define maskSizeMinutes     12
     #define maskSizeHours       6
     #define maskSizeItIs        5
+    #define maskSizeAlmost      5
 
     // "minute" masks
     const int maskMinutes[12][maskSizeMinutes] = 
@@ -67,8 +68,11 @@ class UsermodDKWordClock : public Usermod {
       {105, 106, 107,  -1,  -1,  -1}  // 11: elf
     };
 
-    // mask "it is"
+    // mask "het is"
     const int maskItIs[maskSizeItIs] = {0, 1, 2, 4, 5};
+
+    // mask "bijna"
+    const int maskAlmost[maskSizeAlmost] = {7, 8, 9, 10, 11};
 
     // overall mask to define which LEDs are on
     int maskLedsOn[maskSizeLeds] = 
@@ -120,77 +124,157 @@ class UsermodDKWordClock : public Usermod {
       // clear complete matrix at the beginning
       for (int x = 0; x < maskSizeLeds; x++) {
         maskLedsOn[x] = 0;
-      } 
-      
-      // display it is/es ist if activated
-      if (displayItIs) {
-        updateLedMask(maskItIs, maskSizeItIs);
       }
+      
+      // display "het is"
+      updateLedMask(maskItIs, maskSizeItIs);
 
-      // switch minutes
-      switch (minutes / 5) 
-      {
+      switch (minutes) {
         case 0:
-            // full hour
-            setMinutes(0);
-            setHours(hours);
-            break;
         case 1:
-            // 5 nach
-            setMinutes(1);
-            setHours(hours);
-            break;
         case 2:
-            // 10 nach
-            setMinutes(2);
-            setHours(hours);
-            break;
+          setMinutes(0);
+          setHours(hours);
+          break;
         case 3:
-            // viertel 
-            setMinutes(3);
-            setHours(hours);
-            break;
         case 4:
-            // 20 nach
-            setMinutes(4);
-            setHours(hours + 1);
-            break;
+          updateLedMask(maskAlmost, maskSizeAlmost);
+          setMinutes(1);
+          setHours(hours);
+          break;
         case 5:
-            // 5 vor halb
-            setMinutes(5);
-            setHours(hours + 1);
-            break;
         case 6:
-            // halb
-            setMinutes(6);
-            setHours(hours + 1);
-            break;
         case 7:
-            // 5 nach halb
-            setMinutes(7);
-            setHours(hours + 1);
-            break;
+          setMinutes(1);
+          setHours(hours);
+          break;
         case 8:
-            // 20 vor
-            setMinutes(8);
-            setHours(hours + 1);
-            break;
         case 9:
-            // dreiviertel
-            setMinutes(9);
-            setHours(hours + 1);
-            break;
+          updateLedMask(maskAlmost, maskSizeAlmost);
+          setMinutes(2);
+          setHours(hours);
+          break;
         case 10:
-            // 10 vor
-            setMinutes(10);
-            setHours(hours + 1);
-            break;
         case 11:
-            // 5 vor
-            setMinutes(11);
-            setHours(hours + 1);
-            break;
-        }
+        case 12:
+          setMinutes(2);
+          setHours(hours);
+          break;
+        case 13:
+        case 14:
+          updateLedMask(maskAlmost, maskSizeAlmost);
+          setMinutes(3);
+          setHours(hours);
+          break;
+        case 15:
+        case 16:
+        case 17:
+          setMinutes(3);
+          setHours(hours);
+          break;
+        case 18:
+        case 19:
+          updateLedMask(maskAlmost, maskSizeAlmost);
+          setMinutes(4);
+          setHours(hours);
+          break;
+        case 20:
+        case 21:
+        case 22:
+          setMinutes(4);
+          setHours(hours);
+          break;
+        case 23:
+        case 24:
+          updateLedMask(maskAlmost, maskSizeAlmost);
+          setMinutes(5);
+          setHours(hours + 1);
+          break;
+        case 25:
+        case 26:
+        case 27:
+          setMinutes(5);
+          setHours(hours + 1);
+          break;
+        case 28:
+        case 29:
+          updateLedMask(maskAlmost, maskSizeAlmost);
+          setMinutes(6);
+          setHours(hours + 1);
+          break;
+        case 30:
+        case 31:
+        case 32:
+          setMinutes(6);
+          setHours(hours + 1);
+          break;
+        case 33:
+        case 34:
+          updateLedMask(maskAlmost, maskSizeAlmost);
+          setMinutes(7);
+          setHours(hours + 1);
+          break;
+        case 35:
+        case 36:
+        case 37:
+          setMinutes(7);
+          setHours(hours + 1);
+          break;
+        case 38:
+        case 39:
+          updateLedMask(maskAlmost, maskSizeAlmost);
+          setMinutes(8);
+          setHours(hours + 1);
+          break;
+        case 40:
+        case 41:
+        case 42:
+          setMinutes(8);
+          setHours(hours + 1);
+          break;
+        case 43:
+        case 44:
+          updateLedMask(maskAlmost, maskSizeAlmost);
+          setMinutes(9);
+          setHours(hours + 1);
+          break;
+        case 45:
+        case 46:
+        case 47:
+          setMinutes(9);
+          setHours(hours + 1);
+          break;
+        case 48:
+        case 49:
+          updateLedMask(maskAlmost, maskSizeAlmost);
+          setMinutes(10);
+          setHours(hours + 1);
+          break;
+        case 50:
+        case 51:
+        case 52:
+          setMinutes(10);
+          setHours(hours + 1);
+          break;
+        case 53:
+        case 54:
+          updateLedMask(maskAlmost, maskSizeAlmost);
+          setMinutes(11);
+          setHours(hours + 1);
+          break;
+        case 55:
+        case 56:
+        case 57:
+          setMinutes(11);
+          setHours(hours + 1);
+          break;
+        case 58:
+        case 59:
+          updateLedMask(maskAlmost, maskSizeAlmost);
+          setMinutes(0);
+          setHours(hours + 1);
+          break;
+      }
     }
 
   public:
@@ -296,7 +380,6 @@ class UsermodDKWordClock : public Usermod {
     void addToConfig(JsonObject& root) {
       JsonObject top = root.createNestedObject("UsermodDKWordClock");
       top["active"] = usermodActive;
-      top["displayItIs"] = displayItIs;
     }
 
     /*
@@ -323,7 +406,6 @@ class UsermodDKWordClock : public Usermod {
       bool configComplete = !top.isNull();
 
       configComplete &= getJsonValue(top["active"], usermodActive);
-      configComplete &= getJsonValue(top["displayItIs"], displayItIs);
 
       return configComplete;
     }
