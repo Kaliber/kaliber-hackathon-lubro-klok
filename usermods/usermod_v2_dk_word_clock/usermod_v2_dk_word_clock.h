@@ -8,20 +8,12 @@
  * 
  * Modified version of usermod_v2_word_clock. This usermod can be used to drive
  * a word clock with 12x10 pixel matrix with WLED.
- * 
- * @TODO:
- *  [x] Duitse letters omzetten naar NL
- *  [x] Minuten deel verwijderen en omtoveren naar "bijna"
- *  [ ] Code opschonen
- *  [ ] Kijken of we de button Long Press kunnen uitlezen en op basis daarvan de WordClock aan of uitzetten => zie `button.cpp`
- *  [ ] Iets doen met DEFAULT_BRIGHTNESS en op basis van dag en nacht de felheid aanpassen. Daar ook een optie van maken
  */
 
 //class name. Use something descriptive and leave the ": public Usermod" part :)
 class UsermodDKWordClock : public Usermod {
   private:
     unsigned long lastTime = 0;
-    int lastTimeMinutes = -1;
 
     // set your config variables to their boot default value (this can also be done in readFromConfig() or a constructor if you prefer)
     bool usermodActive = false;
@@ -303,6 +295,10 @@ class UsermodDKWordClock : public Usermod {
      *    Instead, use a timer check as shown here.
      */
     void loop() {
+      // if usermod is disabled or called during strip updating just exit
+      // NOTE: on very long strips strip.isUpdating() may always return true so update accordingly
+      if (!usermodActive || strip.isUpdating()) return;
+
       // do it every 5 seconds
       if (millis() - lastTime > 5000) {
         // check the time
@@ -310,9 +306,6 @@ class UsermodDKWordClock : public Usermod {
 
         // update the display with new time
         updateDisplay(hourFormat12(localTime), minute(localTime));
-
-        // remember last update time
-        lastTimeMinutes = minutes;
 
         // remember last update
         lastTime = millis();
