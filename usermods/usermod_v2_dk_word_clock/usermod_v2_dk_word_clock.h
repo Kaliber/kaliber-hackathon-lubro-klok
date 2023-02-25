@@ -10,11 +10,11 @@
  * a word clock with 12x10 pixel matrix with WLED.
  * 
  * @TODO:
- *  - Duitse letters omzetten naar NL
- *  - Minuten deel verwijderen en omtoveren naar "bijna"
- *  - Code opschonen
- *  - Kijken of we de button Long Press kunnen uitlezen en op basis daarvan de WordClock aan of uitzetten
- *  - Iets doen met DEFAULT_BRIGHTNESS en op basis van dag en nacht de felheid aanpassen. Daar ook een optie van maken
+ *  [x] Duitse letters omzetten naar NL
+ *  [ ] Minuten deel verwijderen en omtoveren naar "bijna"
+ *  [ ] Code opschonen
+ *  [ ] Kijken of we de button Long Press kunnen uitlezen en op basis daarvan de WordClock aan of uitzetten => zie `button.cpp`
+ *  [ ] Iets doen met DEFAULT_BRIGHTNESS en op basis van dag en nacht de felheid aanpassen. Daar ook een optie van maken
  */
 
 //class name. Use something descriptive and leave the ": public Usermod" part :)
@@ -26,126 +26,71 @@ class UsermodDKWordClock : public Usermod {
     // set your config variables to their boot default value (this can also be done in readFromConfig() or a constructor if you prefer)
     bool usermodActive = false;
     bool displayItIs = true;
-    int ledOffset = 0;
-    bool meander = false;
-    bool nord = false;
     
     // defines for mask sizes
-    #define maskSizeLeds        114
+    #define maskSizeLeds        120
     #define maskSizeMinutes     12
-    #define maskSizeMinutesMea  12
     #define maskSizeHours       6
-    #define maskSizeHoursMea    6
     #define maskSizeItIs        5
-    #define maskSizeMinuteDots  4
 
     // "minute" masks
-    // Normal wiring
-    const int maskMinutes[14][maskSizeMinutes] = 
+    const int maskMinutes[12][maskSizeMinutes] = 
     {
-      {107, 108, 109,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1}, // :00
-      {  7,   8,   9,  10,  40,  41,  42,  43,  -1,  -1,  -1,  -1}, // :05 fünf nach
-      { 11,  12,  13,  14,  40,  41,  42,  43,  -1,  -1,  -1,  -1}, // :10 zehn nach
-      { 26,  27,  28,  29,  30,  31,  32,  -1,  -1,  -1,  -1,  -1}, // :15 viertel
-      { 15,  16,  17,  18,  19,  20,  21,  40,  41,  42,  43,  -1}, // :20 zwanzig nach
-      {  7,   8,   9,  10,  33,  34,  35,  44,  45,  46,  47,  -1}, // :25 fünf vor halb
-      { 44,  45,  46,  47,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1}, // :30 halb
-      {  7,   8,   9,  10,  40,  41,  42,  43,  44,  45,  46,  47}, // :35 fünf nach halb
-      { 15,  16,  17,  18,  19,  20,  21,  33,  34,  35,  -1,  -1}, // :40 zwanzig vor
-      { 22,  23,  24,  25,  26,  27,  28,  29,  30,  31,  32,  -1}, // :45 dreiviertel
-      { 11,  12,  13,  14,  33,  34,  35,  -1,  -1,  -1,  -1,  -1}, // :50 zehn vor
-      {  7,   8,   9,  10,  33,  34,  35,  -1,  -1,  -1,  -1,  -1}, // :55 fünf vor
-      { 26,  27,  28,  29,  30,  31,  32,  40,  41,  42,  43,  -1}, // :15 alternative viertel nach
-      { 26,  27,  28,  29,  30,  31,  32,  33,  34,  35,  -1,  -1}  // :45 alternative viertel vor
+      {116, 117, 118,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1}, // :00 uur
+      { 12,  13,  14,  15,  32,  33,  34,  35,  -1,  -1,  -1,  -1}, // :05 vijf over
+      { 20,  21,  22,  23,  32,  33,  34,  35,  -1,  -1,  -1,  -1}, // :10 tien over
+      { 36,  37,  38,  39,  40,  48,  49,  50,  51,  -1,  -1,  -1}, // :15 kwart over
+      { 20,  21,  22,  23,  24,  25,  26,  27,  42,  43,  44,  45}, // :20 tien voor half
+      { 12,  13,  14,  15,  24,  25,  26,  27,  42,  43,  44,  45}, // :25 vijf voor half
+      { 42,  43,  44,  45,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1}, // :30 half
+      { 12,  13,  14,  15,  32,  33,  34,  35,  42,  43,  44,  45}, // :35 vijf over half
+      { 20,  21,  22,  23,  32,  33,  34,  35,  42,  43,  44,  45}, // :40 tien over half
+      { 36,  37,  38,  39,  40,  56,  57,  58,  59,  -1,  -1,  -1}, // :45 kwart voor
+      { 20,  21,  22,  23,  24,  25,  26,  27,  -1,  -1,  -1,  -1}, // :50 tien voor
+      { 12,  13,  14,  15,  24,  25,  26,  27,  -1,  -1,  -1,  -1}, // :55 vijf voor
     };
-
-    // Meander wiring
-    const int maskMinutesMea[14][maskSizeMinutesMea] = 
-    {
-      { 99, 100, 101,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1}, // :00
-      {  7,   8,   9,  10,  33,  34,  35,  36,  -1,  -1,  -1,  -1}, // :05 fünf nach
-      { 18,  19,  20,  21,  33,  34,  35,  36,  -1,  -1,  -1,  -1}, // :10 zehn nach
-      { 26,  27,  28,  29,  30,  31,  32,  -1,  -1,  -1,  -1,  -1}, // :15 viertel
-      { 11,  12,  13,  14,  15,  16,  17,  33,  34,  35,  36,  -1}, // :20 zwanzig nach
-      {  7,   8,   9,  10,  41,  42,  43,  44,  45,  46,  47,  -1}, // :25 fünf vor halb
-      { 44,  45,  46,  47,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1}, // :30 halb
-      {  7,   8,   9,  10,  33,  34,  35,  36,  44,  45,  46,  47}, // :35 fünf nach halb
-      { 11,  12,  13,  14,  15,  16,  17,  41,  42,  43,  -1,  -1}, // :40 zwanzig vor
-      { 22,  23,  24,  25,  26,  27,  28,  29,  30,  31,  32,  -1}, // :45 dreiviertel
-      { 18,  19,  20,  21,  41,  42,  43,  -1,  -1,  -1,  -1,  -1}, // :50 zehn vor
-      {  7,   8,   9,  10,  41,  42,  43,  -1,  -1,  -1,  -1,  -1}, // :55 fünf vor
-      { 26,  27,  28,  29,  30,  31,  32,  33,  34,  35,  36,  -1}, // :15 alternative viertel nach
-      { 26,  27,  28,  29,  30,  31,  32,  41,  42,  43,  -1,  -1}  // :45 alternative viertel vor
-    };
-
 
     // hour masks
-    // Normal wiring
-    const int maskHours[13][maskSizeHours] = 
+    const int maskHours[12][maskSizeHours] = 
     {
-      { 55,  56,  57,  -1,  -1,  -1}, // 01: ein
-      { 55,  56,  57,  58,  -1,  -1}, // 01: eins
-      { 62,  63,  64,  65,  -1,  -1}, // 02: zwei
-      { 66,  67,  68,  69,  -1,  -1}, // 03: drei
-      { 73,  74,  75,  76,  -1,  -1}, // 04: vier
-      { 51,  52,  53,  54,  -1,  -1}, // 05: fünf
-      { 77,  78,  79,  80,  81,  -1}, // 06: sechs
-      { 88,  89,  90,  91,  92,  93}, // 07: sieben
-      { 84,  85,  86,  87,  -1,  -1}, // 08: acht
-      {102, 103, 104, 105,  -1,  -1}, // 09: neun
-      { 99, 100, 101, 102,  -1,  -1}, // 10: zehn
-      { 49,  50,  51,  -1,  -1,  -1}, // 11: elf
-      { 94,  95,  96,  97,  98,  -1}  // 12: zwölf and 00: null
-    };
-    // Meander wiring
-    const int maskHoursMea[13][maskSizeHoursMea] = 
-    {
-      { 63,  64,  65,  -1,  -1,  -1}, // 01: ein
-      { 62,  63,  64,  65,  -1,  -1}, // 01: eins
-      { 55,  56,  57,  58,  -1,  -1}, // 02: zwei
-      { 66,  67,  68,  69,  -1,  -1}, // 03: drei
-      { 73,  74,  75,  76,  -1,  -1}, // 04: vier
-      { 51,  52,  53,  54,  -1,  -1}, // 05: fünf
-      { 83,  84,  85,  86,  87,  -1}, // 06: sechs
-      { 88,  89,  90,  91,  92,  93}, // 07: sieben
-      { 77,  78,  79,  80,  -1,  -1}, // 08: acht
-      {103, 104, 105, 106,  -1,  -1}, // 09: neun
-      {106, 107, 108, 109,  -1,  -1}, // 10: zehn
-      { 49,  50,  51,  -1,  -1,  -1}, // 11: elf
-      { 94,  95,  96,  97,  98,  -1}  // 12: zwölf and 00: null
+      {108, 109, 110, 111, 112, 113}, // 00: => twaalf
+      { 60,  61,  62,  -1,  -1,  -1}, // 01: een
+      { 64,  65,  66,  67,  -1,  -1}, // 02: twee
+      { 68,  69,  70,  71,  -1,  -1}, // 03: drie
+      { 72,  73,  74,  75,  -1,  -1}, // 04: vier
+      { 76,  77,  78,  79,  -1,  -1}, // 05: vijf
+      { 81,  82,  83,  -1,  -1,  -1}, // 06: zes
+      { 84,  85,  86,  87,  88,  -1}, // 07: zeven
+      { 96,  97,  98,  99,  -1,  -1}, // 08: acht
+      { 91,  92,  93,  94,  95,  -1}, // 09: negen
+      {101, 102, 103, 104,  -1,  -1}, // 10: tien
+      {105, 106, 107,  -1,  -1,  -1}  // 11: elf
     };
 
     // mask "it is"
-    const int maskItIs[maskSizeItIs] = {0, 1, 3, 4, 5};
-
-    // mask minute dots
-    const int maskMinuteDots[maskSizeMinuteDots] = {110, 111, 112, 113};
+    const int maskItIs[maskSizeItIs] = {0, 1, 2, 4, 5};
 
     // overall mask to define which LEDs are on
     int maskLedsOn[maskSizeLeds] = 
     {
-      0,0,0,0,0,0,0,0,0,0,0,
-      0,0,0,0,0,0,0,0,0,0,0,
-      0,0,0,0,0,0,0,0,0,0,0,
-      0,0,0,0,0,0,0,0,0,0,0,
-      0,0,0,0,0,0,0,0,0,0,0,
-      0,0,0,0,0,0,0,0,0,0,0,
-      0,0,0,0,0,0,0,0,0,0,0,
-      0,0,0,0,0,0,0,0,0,0,0,
-      0,0,0,0,0,0,0,0,0,0,0,
-      0,0,0,0,0,0,0,0,0,0,0,
-      0,0,0,0
+      0,0,0,0,0,0,0,0,0,0,0,0,
+      0,0,0,0,0,0,0,0,0,0,0,0,
+      0,0,0,0,0,0,0,0,0,0,0,0,
+      0,0,0,0,0,0,0,0,0,0,0,0,
+      0,0,0,0,0,0,0,0,0,0,0,0,
+      0,0,0,0,0,0,0,0,0,0,0,0,
+      0,0,0,0,0,0,0,0,0,0,0,0,
+      0,0,0,0,0,0,0,0,0,0,0,0,
+      0,0,0,0,0,0,0,0,0,0,0,0,
+      0,0,0,0,0,0,0,0,0,0,0,0
     };
 
     // update led mask
-    void updateLedMask(const int wordMask[], int arraySize)
-    {
+    void updateLedMask(const int wordMask[], int arraySize) {
       // loop over array
-      for (int x=0; x < arraySize; x++) 
-      {
+      for (int x=0; x < arraySize; x++) {
         // check if mask has a valid LED number
-        if (wordMask[x] >= 0 && wordMask[x] < maskSizeLeds)
-        {
+        if (wordMask[x] >= 0 && wordMask[x] < maskSizeLeds) {
           // turn LED on
           maskLedsOn[wordMask[x]] = 1;
         }
@@ -153,84 +98,34 @@ class UsermodDKWordClock : public Usermod {
     }
 
     // set hours
-    void setHours(int hours, bool fullClock)
-    {
+    void setHours(int hours) {
       int index = hours;
 
-      // handle 00:xx as 12:xx
-      if (hours == 0)
-      {
-        index = 12;
-      }
-
-      // check if we get an overrun of 12 o´clock
-      if (hours == 13)
-      {
-        index = 1;
-      }
-
-      // special handling for "ein Uhr" instead of "eins Uhr"
-      if (hours == 1 && fullClock == true)
-      {
+      if (hours == 12) {
         index = 0;
       }
 
       // update led mask
-      if (meander)
-      {
-        updateLedMask(maskHoursMea[index], maskSizeHoursMea);
-      } else {
       updateLedMask(maskHours[index], maskSizeHours);
-      }
     }
 
     // set minutes
-    void setMinutes(int index)
-    {
+    void setMinutes(int index) {
       // update led mask
-      if (meander)
-      {
-        updateLedMask(maskMinutesMea[index], maskSizeMinutesMea);
-      } else {
       updateLedMask(maskMinutes[index], maskSizeMinutes);
-      }
-    }
-
-    // set minutes dot
-    void setSingleMinuteDots(int minutes)
-    {
-      // modulo to get minute dots
-      int minutesDotCount = minutes % 5;
-
-      // check if minute dots are active
-      if (minutesDotCount > 0)
-      {
-        // activate all minute dots until number is reached
-        for (int i = 0; i < minutesDotCount; i++)
-        {
-          // activate LED
-          maskLedsOn[maskMinuteDots[i]] = 1;  
-        }
-      }
     }
 
     // update the display
-    void updateDisplay(uint8_t hours, uint8_t minutes) 
-    {
-      // disable complete matrix at the bigging
-      for (int x = 0; x < maskSizeLeds; x++)
-      {
+    void updateDisplay(uint8_t hours, uint8_t minutes) {
+      // clear complete matrix at the beginning
+      for (int x = 0; x < maskSizeLeds; x++) {
         maskLedsOn[x] = 0;
       } 
       
       // display it is/es ist if activated
-      if (displayItIs)
-      {
+      if (displayItIs) {
         updateLedMask(maskItIs, maskSizeItIs);
       }
-
-      // set single minute dots
-      setSingleMinuteDots(minutes);
 
       // switch minutes
       switch (minutes / 5) 
@@ -238,73 +133,62 @@ class UsermodDKWordClock : public Usermod {
         case 0:
             // full hour
             setMinutes(0);
-            setHours(hours, true);
+            setHours(hours);
             break;
         case 1:
             // 5 nach
             setMinutes(1);
-            setHours(hours, false);
+            setHours(hours);
             break;
         case 2:
             // 10 nach
             setMinutes(2);
-            setHours(hours, false);
+            setHours(hours);
             break;
         case 3:
-            if (nord) {
-              // viertel nach
-              setMinutes(12);
-              setHours(hours, false);
-            } else {
-              // viertel 
-              setMinutes(3);
-              setHours(hours + 1, false);
-            };
+            // viertel 
+            setMinutes(3);
+            setHours(hours);
             break;
         case 4:
             // 20 nach
             setMinutes(4);
-            setHours(hours, false);
+            setHours(hours + 1);
             break;
         case 5:
             // 5 vor halb
             setMinutes(5);
-            setHours(hours + 1, false);
+            setHours(hours + 1);
             break;
         case 6:
             // halb
             setMinutes(6);
-            setHours(hours + 1, false);
+            setHours(hours + 1);
             break;
         case 7:
             // 5 nach halb
             setMinutes(7);
-            setHours(hours + 1, false);
+            setHours(hours + 1);
             break;
         case 8:
             // 20 vor
             setMinutes(8);
-            setHours(hours + 1, false);
+            setHours(hours + 1);
             break;
         case 9:
-            // viertel vor bzw dreiviertel
-            if (nord) {
-              setMinutes(9);
-            } 
-              else {
-              setMinutes(12);
-            }
-            setHours(hours + 1, false);
+            // dreiviertel
+            setMinutes(9);
+            setHours(hours + 1);
             break;
         case 10:
             // 10 vor
             setMinutes(10);
-            setHours(hours + 1, false);
+            setHours(hours + 1);
             break;
         case 11:
             // 5 vor
             setMinutes(11);
-            setHours(hours + 1, false);
+            setHours(hours + 1);
             break;
         }
     }
@@ -316,17 +200,13 @@ class UsermodDKWordClock : public Usermod {
      * setup() is called once at boot. WiFi is not yet connected at this point.
      * You can use it to initialize variables, sensors or similar.
      */
-    void setup() 
-    {
-    }
+    void setup() {}
 
     /*
      * connected() is called every time the WiFi is (re)connected
      * Use it to initialize network interfaces
      */
-    void connected() 
-    {
-    }
+    void connected() {}
 
     /*
      * loop() is called continuously. Here you can check for events, read sensors, etc.
@@ -339,22 +219,16 @@ class UsermodDKWordClock : public Usermod {
      *    Instead, use a timer check as shown here.
      */
     void loop() {
-
       // do it every 5 seconds
-      if (millis() - lastTime > 5000) 
-      {
+      if (millis() - lastTime > 5000) {
         // check the time
         int minutes = minute(localTime);
 
-        // check if we already updated this minute
-        if (lastTimeMinutes != minutes)
-        {
-          // update the display with new time
-          updateDisplay(hourFormat12(localTime), minute(localTime));
+        // update the display with new time
+        updateDisplay(hourFormat12(localTime), minute(localTime));
 
-          // remember last update time
-          lastTimeMinutes = minutes;
-        }
+        // remember last update time
+        lastTimeMinutes = minutes;
 
         // remember last update
         lastTime = millis();
@@ -376,17 +250,13 @@ class UsermodDKWordClock : public Usermod {
      * addToJsonState() can be used to add custom entries to the /json/state part of the JSON API (state object).
      * Values in the state object may be modified by connected clients
      */
-    void addToJsonState(JsonObject& root)
-    {
-    }
+    void addToJsonState(JsonObject& root) {}
 
     /*
      * readFromJsonState() can be used to receive data clients send to the /json/state part of the JSON API (state object).
      * Values in the state object may be modified by connected clients
      */
-    void readFromJsonState(JsonObject& root)
-    {
-    }
+    void readFromJsonState(JsonObject& root) {}
 
     /*
      * addToConfig() can be used to add custom persistent settings to the cfg.json file in the "um" (usermod) object.
@@ -423,14 +293,10 @@ class UsermodDKWordClock : public Usermod {
      * 
      * I highly recommend checking out the basics of ArduinoJson serialization and deserialization in order to use custom settings!
      */
-    void addToConfig(JsonObject& root)
-    {
+    void addToConfig(JsonObject& root) {
       JsonObject top = root.createNestedObject("UsermodDKWordClock");
       top["active"] = usermodActive;
       top["displayItIs"] = displayItIs;
-      top["ledOffset"] = ledOffset;
-      top["Meander wiring?"] = meander;
-      top["Norddeutsch"] = nord;
     }
 
     /*
@@ -448,8 +314,7 @@ class UsermodDKWordClock : public Usermod {
      * 
      * This function is guaranteed to be called on boot, but could also be called every time settings are updated
      */
-    bool readFromConfig(JsonObject& root)
-    {
+    bool readFromConfig(JsonObject& root) {
       // default settings values could be set here (or below using the 3-argument getJsonValue()) instead of in the class definition or constructor
       // setting them inside readFromConfig() is slightly more robust, handling the rare but plausible use case of single value being missing after boot (e.g. if the cfg.json was manually edited and a value was removed)
 
@@ -459,9 +324,6 @@ class UsermodDKWordClock : public Usermod {
 
       configComplete &= getJsonValue(top["active"], usermodActive);
       configComplete &= getJsonValue(top["displayItIs"], displayItIs);
-      configComplete &= getJsonValue(top["ledOffset"], ledOffset);
-      configComplete &= getJsonValue(top["Meander wiring?"], meander);
-      configComplete &= getJsonValue(top["Norddeutsch"], nord);
 
       return configComplete;
     }
@@ -471,19 +333,15 @@ class UsermodDKWordClock : public Usermod {
      * Use this to blank out some LEDs or set them to a different color regardless of the set effect mode.
      * Commonly used for custom clocks (Cronixie, 7 segment)
      */
-    void handleOverlayDraw()
-    {
+    void handleOverlayDraw() {
       // check if usermod is active
-      if (usermodActive == true)
-      {
+      if (usermodActive == true) {
         // loop over all leds
-        for (int x = 0; x < maskSizeLeds; x++)
-        {
+        for (int x = 0; x < maskSizeLeds; x++) {
           // check mask
-          if (maskLedsOn[x] == 0)
-          {
+          if (maskLedsOn[x] == 0) {
             // set pixel off
-            strip.setPixelColor(x + ledOffset, RGBW32(0,0,0,0));
+            strip.setPixelColor(x, RGBW32(0,0,0,0));
           }
         }
       }
@@ -493,8 +351,7 @@ class UsermodDKWordClock : public Usermod {
      * getId() allows you to optionally give your V2 usermod an unique ID (please define it in const.h!).
      * This could be used in the future for the system to determine whether your usermod is installed.
      */
-    uint16_t getId()
-    {
+    uint16_t getId() {
       return USERMOD_ID_WORDCLOCK;
     }
 
