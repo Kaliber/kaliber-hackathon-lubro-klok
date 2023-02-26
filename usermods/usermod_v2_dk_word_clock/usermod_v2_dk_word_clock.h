@@ -176,13 +176,13 @@ class UsermodDKWordClock : public Usermod {
         case 19:
           updateLedMask(maskAlmost, maskSizeAlmost);
           setMinutes(4);
-          setHours(hours);
+          setHours(hours + 1);
           break;
         case 20:
         case 21:
         case 22:
           setMinutes(4);
-          setHours(hours);
+          setHours(hours + 1);
           break;
         case 23:
         case 24:
