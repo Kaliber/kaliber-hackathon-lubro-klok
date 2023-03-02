@@ -104,6 +104,11 @@ class UsermodDKWordClock : public Usermod {
         index = 0;
       }
 
+      // check if we get an overrun of 12 o´clock
+      if (hours == 13) {
+        index = 1;
+      }
+
       // update led mask
       updateLedMask(maskHours[index], maskSizeHours);
     }
