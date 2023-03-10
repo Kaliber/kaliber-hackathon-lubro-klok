@@ -1,6 +1,8 @@
 # DK Word Clock
 
-Configuration file:
+Looking for a clock that's not only functional but also a stunning piece of art? Look no further than the custom-designed word clock with RGB LEDs! With its sleek and modern design, this clock displays the time in a visually striking way using illuminated words. The clock is powered by an ESP8266 microcontroller, a powerful and versatile Wi-Fi enabled microcontroller. The clock is programmed using the WLED library, giving you full control over the RGB LEDs and enabling a wide range of effects and animations to be displayed. With this library, you can fully customize the clock to suit your style and preferences. So not only is this clock a functional timepiece, but it's also a cutting-edge work of art that's sure to impress.
+
+### Configuration file:
 ```json
 {
   "rev": [
