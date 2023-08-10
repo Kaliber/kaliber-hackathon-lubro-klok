@@ -1,1 +1,0 @@
-# Lubro Word Clock

@@ -1,84 +1,31 @@
-<p align="center">
-  <img src="/images/wled_logo_akemi.png">
-  <a href="https://github.com/Aircoookie/WLED/releases"><img src="https://img.shields.io/github/release/Aircoookie/WLED.svg?style=flat-square"></a>
-  <a href="https://raw.githubusercontent.com/Aircoookie/WLED/master/LICENSE"><img src="https://img.shields.io/github/license/Aircoookie/wled?color=blue&style=flat-square"></a>
-  <a href="https://wled.discourse.group"><img src="https://img.shields.io/discourse/topics?colorB=blue&label=forum&server=https%3A%2F%2Fwled.discourse.group%2F&style=flat-square"></a>
-  <a href="https://discord.gg/KuqP7NE"><img src="https://img.shields.io/discord/473448917040758787.svg?colorB=blue&label=discord&style=flat-square"></a>
-  <a href="https://kno.wled.ge"><img src="https://img.shields.io/badge/quick_start-wiki-blue.svg?style=flat-square"></a>
-  <a href="https://github.com/Aircoookie/WLED-App"><img src="https://img.shields.io/badge/app-wled-blue.svg?style=flat-square"></a>
-  <a href="https://gitpod.io/#https://github.com/Aircoookie/WLED"><img src="https://img.shields.io/badge/Gitpod-ready--to--code-blue?style=flat-square&logo=gitpod"></a>
+# WLED Word Clock edition
 
-  </p>
+Welcome to our custom fork of WLED! This repository represents a modified version of the original WLED project, tailored to address specific needs and enhancements. If you're searching for the original README, you can locate it [here](WLED.md).
 
-# Welcome to my project WLED! ✨
+## Custom Usermod: Word Clock Usermod
 
-A fast and feature-rich implementation of an ESP8266/ESP32 webserver to control NeoPixel (WS2812B, WS2811, SK6812) LEDs or also SPI based chipsets like the WS2801 and APA102!
+One of the unique features of our fork is the custom usermod "usermod_v2_lubro_word_clock." This usermod can be found in the `usermods/usermod_v2_lubro_word_clock` directory. It introduces an enchanting word clock functionality to your LED setup, transforming your lights into a captivating and functional time display.
 
-## ⚙️ Features
-- WS2812FX library with more than 100 special effects  
-- FastLED noise effects and 50 palettes  
-- Modern UI with color, effect and segment controls  
-- Segments to set different effects and colors to user defined parts of the LED string  
-- Settings page - configuration via the network  
-- Access Point and station mode - automatic failsafe AP  
-- Up to 10 LED outputs per instance
-- Support for RGBW strips  
-- Up to 250 user presets to save and load colors/effects easily, supports cycling through them.  
-- Presets can be used to automatically execute API calls  
-- Nightlight function (gradually dims down)  
-- Full OTA software updatability (HTTP + ArduinoOTA), password protectable  
-- Configurable analog clock (Cronixie, 7-segment and EleksTube IPS clock support via usermods) 
-- Configurable Auto Brightness limit for safe operation  
-- Filesystem-based config for easier backup of presets and settings  
+To utilize this usermod, simply follow the provided instructions in the directory. Comprehensive details on integrating and configuring the word clock usermod seamlessly into your LED project are available.
 
-## 💡 Supported light control interfaces
-- WLED app for [Android](https://play.google.com/store/apps/details?id=com.aircoookie.WLED) and [iOS](https://apps.apple.com/us/app/wled/id1475695033)
-- JSON and HTTP request APIs  
-- MQTT   
-- E1.31, Art-Net, DDP and TPM2.net
-- [diyHue](https://github.com/diyhue/diyHue) (Wled is supported by diyHue, including Hue Sync Entertainment under udp. Thanks to [Gregory Mallios](https://github.com/gmallios))
-- [Hyperion](https://github.com/hyperion-project/hyperion.ng)
-- UDP realtime  
-- Alexa voice control (including dimming and color)  
-- Sync to Philips hue lights  
-- Adalight (PC ambilight via serial) and TPM2  
-- Sync color of multiple WLED devices (UDP notifier)  
-- Infrared remotes (24-key RGB, receiver required)  
-- Simple timers/schedules (time from NTP, timezones/DST supported)  
+## Updating ESP8266 Firmware with PlatformIO
 
-## 📲 Quick start guide and documentation
+If you're utilizing an ESP8266 board and require a firmware update, follow these steps using Visual Studio Code and the PlatformIO extension:
 
-See the [documentation on our official site](https://kno.wled.ge)!
+1. **USB-C Connection:** To initiate the firmware update process, establish a connection between your ESP8266 board and your computer using a USB-C cable.
 
-[On this page](https://kno.wled.ge/basics/tutorials/) you can find excellent tutorials and tools to help you get your new project up and running!
+2. **Enter Firmware Update Mode:** Place your ESP8266 board into firmware update mode. This typically entails holding down a designated button or pin while powering up the board. Consult your board's documentation for precise guidelines.
 
-## 🖼️ User interface
-<img src="/images/macbook-pro-space-gray-on-the-wooden-table.jpg" width="50%"><img src="/images/walking-with-iphone-x.jpg" width="50%">
+3. **Visual Studio Code and PlatformIO:** Open your project in Visual Studio Code and make sure you have the PlatformIO extension installed. PlatformIO simplifies the firmware update process.
 
-## 💾 Compatible hardware
+4. **Select Board and Port:** Using the PlatformIO status bar at the bottom, select your ESP8266 board model and the appropriate port.
 
-See [here](https://kno.wled.ge/basics/compatible-hardware)!
+5. **Upload Firmware:** With your ESP8266 in firmware update mode, press the PlatformIO "Upload" button in the toolbar. PlatformIO will compile the firmware and flash it onto the ESP8266.
 
-## ✌️ Other
+6. **Complete Update:** Following the successful firmware update, your ESP8266 board will restart. At this point, you can begin enjoying the enhanced features presented by this custom WLED fork.
 
-Licensed under the MIT license  
-Credits [here](https://kno.wled.ge/about/contributors/)!
+We encourage you to delve into the assorted modifications and enhancements that we've implemented in this fork. Should inquiries arise or challenges manifest, please consult the documentation provided both here and in the specific directories. Happy exploration and LED experimentation!
 
-Join the Discord server to discuss everything about WLED!
+## License
 
-<a href="https://discord.gg/KuqP7NE"><img src="https://discordapp.com/api/guilds/473448917040758787/widget.png?style=banner2" width="25%"></a>
-
-Check out the WLED [Discourse forum](https://wled.discourse.group)!  
-
-You can also send me mails to [dev.aircoookie@gmail.com](mailto:dev.aircoookie@gmail.com), but please, only do so if you want to talk to me privately.  
-
-If WLED really brightens up your day, you can [![](https://img.shields.io/badge/send%20me%20a%20small%20gift-paypal-blue.svg?style=flat-square)](https://paypal.me/aircoookie)
-
-
-*Disclaimer:*   
-
-If you are prone to photosensitive epilepsy, we recommended you do **not** use this software.  
-If you still want to try, don't use strobe, lighting or noise modes or high effect speed settings.
-
-As per the MIT license, I assume no liability for any damage to you or any other person or equipment.  
-
+This custom WLED fork is released under the same license as the original WLED project. Refer to the license documentation for comprehensive information.
