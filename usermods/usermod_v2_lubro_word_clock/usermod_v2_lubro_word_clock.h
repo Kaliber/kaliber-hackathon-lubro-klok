@@ -25,6 +25,13 @@ class UsermodLubroWordClock : public Usermod {
     #define maskSizeHours       6
     #define maskSizeItIs        5
     #define maskSizeAlmost      8
+    #define maskSizeWeek        4
+    #define maskSizeOn          2
+    #define maskSizeOff         3
+    #define maskSizeSmiley      1
+    #define maskSizeTijd        4
+    #define maskSizeVoor        4
+    #define maskSizeBier        4
 
     // "minute" masks
     const int maskMinutes[12][maskSizeMinutes] =
@@ -65,6 +72,15 @@ class UsermodLubroWordClock : public Usermod {
 
     // mask "ongeveer"
     const int maskAlmost[maskSizeAlmost] = {11, 12, 13, 14, 15, 16, 17, 18};
+
+    // mask specials
+    const int maskWeek[maskSizeWeek] = {29, 30, 31, 32};
+    const int maskOn[maskSizeOn] = {49, 50};
+    const int maskOff[maskSizeOff] = {37, 38, 39};
+    const int maskSmiley[maskSizeSmiley] = {131};
+    const int maskTijd[maskSizeTijd] = {0, 1, 2, 3};
+    const int maskVoor[maskSizeVoor] = {40, 41, 42, 43};
+    const int maskBier[maskSizeBier] = {69, 70, 71, 72};
 
     // tommy matrix location
     const int tommyLogoPin = 61;
@@ -121,10 +137,35 @@ class UsermodLubroWordClock : public Usermod {
     }
 
     // update the display
-    void updateDisplay(uint8_t hours, uint8_t minutes) {
+    void updateDisplay(uint8_t hours, uint8_t minutes, uint8_t weekday) {
       // clear complete matrix at the beginning
       for (int x = 0; x < maskSizeLeds; x++) {
         maskLedsOn[x] = 0;
+      }
+
+      bool isWeekOn = weekday == timeDayOfWeek_t::dowMonday && hour(localTime) == 9 && minutes < 31;
+      bool isWeekOff = weekday == timeDayOfWeek_t::dowFriday && hour(localTime) == 17 && minutes < 31;
+      bool isBierTijd = weekday == timeDayOfWeek_t::dowFriday && (hour(localTime) >= 17 || hour(localTime) <= 21);
+
+      if (isWeekOn) {
+        updateLedMask(maskWeek, maskSizeWeek);
+        updateLedMask(maskOn, maskSizeOn);
+        return;
+      }
+
+      if (isWeekOff) {
+        updateLedMask(maskWeek, maskSizeWeek);
+        updateLedMask(maskOff, maskSizeOff);
+        return;
+      }
+
+      if (!isWeekOff && isBierTijd) {
+        updateLedMask(maskItIs, maskSizeItIs);
+        updateLedMask(maskTijd, maskSizeTijd);
+        updateLedMask(maskVoor, maskSizeVoor);
+        updateLedMask(maskBier, maskSizeBier);
+        updateLedMask(maskSmiley, maskSizeSmiley);
+        return;
       }
 
       // display "het is"
@@ -316,7 +357,7 @@ class UsermodLubroWordClock : public Usermod {
       // do it every 5 seconds
       if (millis() - lastTime > 5000) {
         // update the display with new time
-        updateDisplay(hourFormat12(localTime), minute(localTime)); // TODO: add weekday to updateDisplay for custom messages
+        updateDisplay(hourFormat12(localTime), minute(localTime), weekday(localTime));
 
         // remember last update
         lastTime = millis();
