@@ -137,8 +137,8 @@
   #include "../usermods/usermod_v2_word_clock/usermod_v2_word_clock.h"
 #endif
 
-#ifdef USERMOD_DK_WORDCLOCK
-  #include "../usermods/usermod_v2_dk_word_clock/usermod_v2_dk_word_clock.h"
+#ifdef USERMOD_LUBRO_WORDCLOCK
+  #include "../usermods/usermod_v2_lubro_word_clock/usermod_v2_lubro_word_clock.h"
 #endif
 
 #ifdef USERMOD_MY9291
@@ -310,8 +310,8 @@ void registerUsermods()
   usermods.add(new WordClockUsermod());
   #endif
 
-  #ifdef USERMOD_DK_WORDCLOCK
-  usermods.add(new UsermodDKWordClock());
+  #ifdef USERMOD_LUBRO_WORDCLOCK
+  usermods.add(new UsermodLubroWordClock());
   #endif
 
   #ifdef USERMOD_MY9291

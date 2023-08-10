@@ -5,29 +5,29 @@
 /*
  * Usermods allow you to add own functionality to WLED more easily
  * See: https://github.com/Aircoookie/WLED/wiki/Add-own-functionality
- * 
+ *
  * Modified version of usermod_v2_word_clock. This usermod can be used to drive
  * a word clock with 12x10 pixel matrix with WLED.
  */
 
 //class name. Use something descriptive and leave the ": public Usermod" part :)
-class UsermodDKWordClock : public Usermod {
+class UsermodLubroWordClock : public Usermod {
   private:
     unsigned long lastTime = 0;
 
     // set your config variables to their boot default value (this can also be done in readFromConfig() or a constructor if you prefer)
     bool usermodActive = false;
-    bool heartEnabled = false;
-    
+    bool tommyLogoEnabled = false;
+
     // defines for mask sizes
-    #define maskSizeLeds        120
+    #define maskSizeLeds        132
     #define maskSizeMinutes     12
     #define maskSizeHours       6
     #define maskSizeItIs        5
-    #define maskSizeAlmost      5
+    #define maskSizeAlmost      8
 
     // "minute" masks
-    const int maskMinutes[12][maskSizeMinutes] = 
+    const int maskMinutes[12][maskSizeMinutes] =
     {
       {116, 117, 118,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1}, // :00 uur
       { 12,  13,  14,  15,  32,  33,  34,  35,  -1,  -1,  -1,  -1}, // :05 vijf over
@@ -44,44 +44,45 @@ class UsermodDKWordClock : public Usermod {
     };
 
     // hour masks
-    const int maskHours[12][maskSizeHours] = 
+    const int maskHours[12][maskSizeHours] =
     {
-      {108, 109, 110, 111, 112, 113}, // 00: => twaalf
-      { 60,  61,  62,  -1,  -1,  -1}, // 01: een
-      { 64,  65,  66,  67,  -1,  -1}, // 02: twee
-      { 68,  69,  70,  71,  -1,  -1}, // 03: drie
-      { 72,  73,  74,  75,  -1,  -1}, // 04: vier
-      { 76,  77,  78,  79,  -1,  -1}, // 05: vijf
-      { 81,  82,  83,  -1,  -1,  -1}, // 06: zes
-      { 84,  85,  86,  87,  88,  -1}, // 07: zeven
-      { 96,  97,  98,  99,  -1,  -1}, // 08: acht
-      { 91,  92,  93,  94,  95,  -1}, // 09: negen
-      {101, 102, 103, 104,  -1,  -1}, // 10: tien
-      {105, 106, 107,  -1,  -1,  -1}  // 11: elf
+      { 121, 122, 123, 124, 125, 126 }, // 00: => twaalf
+      {  66,  67,  68,  -1,  -1,  -1 }, // 01: een
+      {  77,  78,  79,  80,  -1,  -1 }, // 02: twee
+      {  84,  85,  86,  87,  -1,  -1 }, // 03: drie
+      {  95,  96,  97,  98,  -1,  -1 }, // 04: vier
+      {  91,  92,  93,  94,  -1,  -1 }, // 05: vijf
+      {  88,  89,  90,  -1,  -1,  -1 }, // 06: zes
+      {  99, 100, 101, 102, 103,  -1 }, // 07: zeven
+      { 117, 118, 119, 120,  -1,  -1 }, // 08: acht
+      { 105, 106, 107, 108, 109,  -1 }, // 09: negen
+      { 113, 114, 115, 116,  -1,  -1 }, // 10: tien
+      { 110, 111, 112,  -1,  -1,  -1 }  // 11: elf
     };
 
     // mask "het is"
-    const int maskItIs[maskSizeItIs] = {0, 1, 2, 4, 5};
+    const int maskItIs[maskSizeItIs] = {8, 9, 10, 6, 5};
 
-    // mask "bijna"
-    const int maskAlmost[maskSizeAlmost] = {7, 8, 9, 10, 11};
+    // mask "ongeveer"
+    const int maskAlmost[maskSizeAlmost] = {11, 12, 13, 14, 15, 16, 17, 18};
 
-    // heart matrix location
-    const int heartPin = 119;
+    // tommy matrix location
+    const int tommyLogoPin = 61;
 
     // overall mask to define which LEDs are on
-    int maskLedsOn[maskSizeLeds] = 
+    int maskLedsOn[maskSizeLeds] =
     {
-      0,0,0,0,0,0,0,0,0,0,0,0,
-      0,0,0,0,0,0,0,0,0,0,0,0,
-      0,0,0,0,0,0,0,0,0,0,0,0,
-      0,0,0,0,0,0,0,0,0,0,0,0,
-      0,0,0,0,0,0,0,0,0,0,0,0,
-      0,0,0,0,0,0,0,0,0,0,0,0,
-      0,0,0,0,0,0,0,0,0,0,0,0,
-      0,0,0,0,0,0,0,0,0,0,0,0,
-      0,0,0,0,0,0,0,0,0,0,0,0,
-      0,0,0,0,0,0,0,0,0,0,0,0
+      0,0,0,0,0,0,0,0,0,0,0,
+      0,0,0,0,0,0,0,0,0,0,0,
+      0,0,0,0,0,0,0,0,0,0,0,
+      0,0,0,0,0,0,0,0,0,0,0,
+      0,0,0,0,0,0,0,0,0,0,0,
+      0,0,0,0,0,0,0,0,0,0,0,
+      0,0,0,0,0,0,0,0,0,0,0,
+      0,0,0,0,0,0,0,0,0,0,0,
+      0,0,0,0,0,0,0,0,0,0,0,
+      0,0,0,0,0,0,0,0,0,0,0,
+      0,0,0,0,0,0,0,0,0,0,0
     };
 
     // update led mask
@@ -125,13 +126,13 @@ class UsermodDKWordClock : public Usermod {
       for (int x = 0; x < maskSizeLeds; x++) {
         maskLedsOn[x] = 0;
       }
-      
+
       // display "het is"
       updateLedMask(maskItIs, maskSizeItIs);
 
-      // show heart if enabled
-      if (heartEnabled) {
-        maskLedsOn[heartPin] = 1;
+      // show tommy if enabled
+      if (tommyLogoEnabled) {
+        maskLedsOn[tommyLogoPin] = 1;
       }
 
       switch (minutes) {
@@ -299,11 +300,11 @@ class UsermodDKWordClock : public Usermod {
 
     /*
      * loop() is called continuously. Here you can check for events, read sensors, etc.
-     * 
+     *
      * Tips:
      * 1. You can use "if (WLED_CONNECTED)" to check for a successful network connection.
      *    Additionally, "if (WLED_MQTT_CONNECTED)" is available to check for a connection to an MQTT broker.
-     * 
+     *
      * 2. Try to avoid using the delay() function. NEVER use delays longer than 10 milliseconds.
      *    Instead, use a timer check as shown here.
      */
@@ -315,7 +316,7 @@ class UsermodDKWordClock : public Usermod {
       // do it every 5 seconds
       if (millis() - lastTime > 5000) {
         // update the display with new time
-        updateDisplay(hourFormat12(localTime), minute(localTime));
+        updateDisplay(hourFormat12(localTime), minute(localTime)); // TODO: add weekday to updateDisplay for custom messages
 
         // remember last update
         lastTime = millis();
@@ -349,11 +350,11 @@ class UsermodDKWordClock : public Usermod {
      * addToConfig() can be used to add custom persistent settings to the cfg.json file in the "um" (usermod) object.
      * It will be called by WLED when settings are actually saved (for example, LED settings are saved)
      * If you want to force saving the current state, use serializeConfig() in your loop().
-     * 
+     *
      * CAUTION: serializeConfig() will initiate a filesystem write operation.
      * It might cause the LEDs to stutter and will cause flash wear if called too often.
      * Use it sparingly and always in the loop, never in network callbacks!
-     * 
+     *
      * addToConfig() will make your settings editable through the Usermod Settings page automatically.
      *
      * Usermod Settings Overview:
@@ -373,44 +374,44 @@ class UsermodDKWordClock : public Usermod {
      *   - Tip: use int8_t to store the pin value in the Usermod, so a -1 value (pin not set) can be used
      *
      * See usermod_v2_auto_save.h for an example that saves Flash space by reusing ArduinoJson key name strings
-     * 
-     * If you need a dedicated settings page with custom layout for your Usermod, that takes a lot more work.  
+     *
+     * If you need a dedicated settings page with custom layout for your Usermod, that takes a lot more work.
      * You will have to add the setting to the HTML, xml.cpp and set.cpp manually.
      * See the WLED Soundreactive fork (code and wiki) for reference.  https://github.com/atuline/WLED
-     * 
+     *
      * I highly recommend checking out the basics of ArduinoJson serialization and deserialization in order to use custom settings!
      */
     void addToConfig(JsonObject& root) {
-      JsonObject top = root.createNestedObject("UsermodDKWordClock");
+      JsonObject top = root.createNestedObject("UsermodLubroWordClock");
       top["active"] = usermodActive;
-      top["heartSymbol"] = heartEnabled;
+      top["tommyLogo"] = tommyLogoEnabled;
     }
 
     /*
      * readFromConfig() can be used to read back the custom settings you added with addToConfig().
      * This is called by WLED when settings are loaded (currently this only happens immediately after boot, or after saving on the Usermod Settings page)
-     * 
+     *
      * readFromConfig() is called BEFORE setup(). This means you can use your persistent values in setup() (e.g. pin assignments, buffer sizes),
      * but also that if you want to write persistent values to a dynamic buffer, you'd need to allocate it here instead of in setup.
      * If you don't know what that is, don't fret. It most likely doesn't affect your use case :)
-     * 
+     *
      * Return true in case the config values returned from Usermod Settings were complete, or false if you'd like WLED to save your defaults to disk (so any missing values are editable in Usermod Settings)
-     * 
+     *
      * getJsonValue() returns false if the value is missing, or copies the value into the variable provided and returns true if the value is present
      * The configComplete variable is true only if the "exampleUsermod" object and all values are present.  If any values are missing, WLED will know to call addToConfig() to save them
-     * 
+     *
      * This function is guaranteed to be called on boot, but could also be called every time settings are updated
      */
     bool readFromConfig(JsonObject& root) {
       // default settings values could be set here (or below using the 3-argument getJsonValue()) instead of in the class definition or constructor
       // setting them inside readFromConfig() is slightly more robust, handling the rare but plausible use case of single value being missing after boot (e.g. if the cfg.json was manually edited and a value was removed)
 
-      JsonObject top = root["UsermodDKWordClock"];
+      JsonObject top = root["UsermodLubroWordClock"];
 
       bool configComplete = !top.isNull();
 
       configComplete &= getJsonValue(top["active"], usermodActive);
-      configComplete &= getJsonValue(top["heartSymbol"], heartEnabled);
+      configComplete &= getJsonValue(top["tommyLogo"], tommyLogoEnabled);
 
       return configComplete;
     }
@@ -432,8 +433,8 @@ class UsermodDKWordClock : public Usermod {
           }
         }
 
-        if (heartEnabled) {
-          strip.setPixelColor(heartPin, RGBW32(255,0,0,0)); // Making sure the heart is always "red"
+        if (tommyLogoEnabled) {
+          strip.setPixelColor(tommyLogoPin, RGBW32(255,255,255,0)); // Making sure the tommy is always "red"
         }
       }
     }
