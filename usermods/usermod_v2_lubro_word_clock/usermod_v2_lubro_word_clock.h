@@ -145,7 +145,7 @@ class UsermodLubroWordClock : public Usermod {
 
       bool isWeekOn = weekday == timeDayOfWeek_t::dowMonday && hour(localTime) == 9 && minutes < 31;
       bool isWeekOff = weekday == timeDayOfWeek_t::dowFriday && hour(localTime) == 17 && minutes < 31;
-      bool isBierTijd = weekday == timeDayOfWeek_t::dowFriday && (hour(localTime) >= 17 || hour(localTime) <= 21);
+      bool isBierTijd = weekday == timeDayOfWeek_t::dowFriday && hour(localTime) >= 17 && hour(localTime) <= 21;
 
       if (isWeekOn) {
         updateLedMask(maskWeek, maskSizeWeek);
